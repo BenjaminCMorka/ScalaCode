@@ -41,7 +41,9 @@ def overlap(lst1: List[String], lst2: List[String]) : Double = {
     (prod(lst1, lst2).toDouble / squareLst1.max(squareLst2))
 }
 
-def similarity(s1: String, s2: String) : Double = ???
+def similarity(s1: String, s2: String) : Double = {
+    overlap(clean(s1), clean(s2))
+}
 
 
 
