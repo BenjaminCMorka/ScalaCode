@@ -16,7 +16,11 @@ def clean(s: String) : List[String] = {
 
 
 //(2)
-def occurrences(xs: List[String]): Map[String, Int] = ???
+def occurrences(xs: List[String]): Map[String, Int] = {
+
+    xs.distinct.map(str => ( str, xs.count(_ == str) ) ).toMap
+    
+}
 
 
 //(3)
