@@ -1,5 +1,7 @@
 .metals/
 .vscode/
+.scala-build/
+.bsp/
 *.tasty
 *.jar
 *.class

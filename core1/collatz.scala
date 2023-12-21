@@ -51,14 +51,7 @@ def last_odd(n: Long) : Long = {
     }
 }
 
-def is_even(n: Long) : Boolean = {
-    if(n % 2 == 0){
-        true
-    }
-    else{
-        false
-    }
-}
+def is_even(n: Long) : Boolean = n % 2 == 0
 
 }
 

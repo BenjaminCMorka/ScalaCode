@@ -19,12 +19,17 @@ def clean(s: String) : List[String] = {
 def occurrences(xs: List[String]): Map[String, Int] = {
 
     xs.distinct.map(str => ( str, xs.count(_ == str) ) ).toMap
-    
+
 }
 
 
 //(3)
-def prod(lst1: List[String], lst2: List[String]) : Int = ???
+def prod(lst1: List[String], lst2: List[String]) : Int = {
+
+    val allStrings = (lst1 ++ lst2).distinct
+    
+    allStrings.map(str => lst1.count(_ == str) * lst2.count(_ == str)).sum
+}
 
 
 //(4)
