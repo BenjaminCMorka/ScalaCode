@@ -1,1 +1,6 @@
 .metals/
+.vscode/
+*.tasty
+*.jar
+*.class
+.DS_Store

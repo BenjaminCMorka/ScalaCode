@@ -8,8 +8,11 @@ object C2 {
 //======================
 
 //(1)
-def clean(s: String) : List[String] = ???
-  
+def clean(s: String) : List[String] = {
+    val reg = """\w+""".r
+    reg.findAllIn(s).toList
+}
+
 
 
 //(2)
