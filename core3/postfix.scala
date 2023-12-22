@@ -34,9 +34,9 @@ def syard(toks: Toks, st: Toks = Nil, out: Toks = Nil) : Toks =
 
 		case x::xs if x.forall(_.isDigit) => syard(xs, st, out:+ x)
 
-		case x::xs if is_op(x) && st.nonEmpty && prec(st.head, x) => syard(x::xs, st.tail, out:+ st.head)
+		case x::xs if is_op(x) && st != Nil && prec(st.head, x) => syard(x::xs, st.tail, out:+ st.head)
 
-		case x::xs if is_op(x) && (st.isEmpty || !prec(st.head, x)) => syard(xs, x::st, out)
+		case x::xs if is_op(x) && (st == Nil || !prec(st.head, x)) => syard(xs, x::st, out)
 
 		case x::xs if x == "(" => syard(xs, x::st, out)
 
