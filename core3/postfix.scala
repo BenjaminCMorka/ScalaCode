@@ -69,8 +69,49 @@ def syard(toks: Toks, st: Toks = Nil, out: Toks = Nil) : Toks =
 //syard(split("( ( ( 3 ) ) + ( ( 4 + ( 5 ) ) ) )")) // 3 4 5 + +
 
 
+
 // (2) 
-def compute(toks: Toks, st: List[Int] = Nil) : Int = ???
+def compute(toks: Toks, st: List[Int] = Nil) : Int =
+	toks match {
+		case Nil => if (st.length == 1) st.head else -1
+
+		case x::xs if x.forall(_.isDigit) => compute(xs, x.toInt :: st)
+
+		case x::xs if x == "+" => {
+			val num1 = st.head
+			val num2 = st.tail.head
+
+			val restOfList = st.tail.tail
+			compute(xs, (num2 + num1) :: restOfList)
+		}
+
+		case x::xs if x == "-" => {
+			val num1 = st.head
+			val num2 = st.tail.head
+
+			val restOfList = st.tail.tail
+			compute(xs, (num2 - num1)::restOfList)
+		}
+
+		case x::xs if x == "*" => {
+			val num1 = st.head
+			val num2 = st.tail.head
+
+			val restOfList = st.tail.tail
+			compute(xs, (num2 * num1)::restOfList)
+		}
+
+		case x::xs if x == "/" => {
+			val num1 = st.head
+			val num2 = st.tail.head
+
+			val restOfList = st.tail.tail
+			compute(xs, (num2 / num1)::restOfList)
+		}
+
+		case _ => -1
+	}
+	
 
 
 // test cases
