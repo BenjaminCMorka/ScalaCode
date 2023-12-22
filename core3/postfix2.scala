@@ -27,21 +27,53 @@ def assoc(s: String) : Assoc = s match {
 
 // the precedences of the operators
 val precs = Map("+" -> 1,
-  		"-" -> 1,
+  	"-" -> 1,
 		"*" -> 2,
 		"/" -> 2,
-                "^" -> 4)
+    "^" -> 4)
 
 // the operations in the basic version of the algorithm
 val ops = List("+", "-", "*", "/", "^")
 
 // ADD YOUR CODE BELOW
 //======================
+def is_op(op: String) : Boolean = ops.contains(op)
 
+def prec(op1: String, op2: String) : Boolean = precs.getOrElse(op1, 0) >= precs.getOrElse(op2, 0)
+
+def prec_right(op1: String, op2: String) : Boolean = precs.getOrElse(op1, 0) > precs.getOrElse(op2, 0)
 
 
 // (3) 
-def syard(toks: Toks, st: Toks = Nil, out: Toks = Nil) : Toks = ???
+def syard(toks: Toks, st: Toks = Nil, out: Toks = Nil) : Toks =
+  toks match {
+  case Nil => out ++ st.filter(is_op)
+
+  case x::xs if x.forall(_.isDigit) => syard(xs, st, out:+ x)
+
+  case x::xs if is_op(x) && x != "^" && st != Nil && prec(st.head, x) => syard(x::xs, st.tail, out:+ st.head)
+
+  case x::xs if is_op(x) && x != "^" && (st == Nil || !prec(st.head, x)) => syard(xs, x::st, out)
+
+  case x::xs if is_op(x) && x == "^" && st != Nil && prec_right(st.head, x) => syard(x::xs, st.tail, out:+ st.head)
+
+  case x::xs if is_op(x) && x == "^" && (st == Nil || !prec_right(st.head, x)) => syard(xs, x::st, out)
+
+  case x::xs if x == "(" => syard(xs, x::st, out)
+
+  case x::xs if x == ")" => {
+    st match {
+      
+      case hd::tl if hd == "(" => syard(xs, tl, out) 
+
+      case hd::tl if is_op(hd) => syard(x::xs, tl, out:+ hd) 
+
+      case _  => out
+    }
+    
+  }
+  case _ => out
+  }
 
 
 // test cases
@@ -49,7 +81,55 @@ def syard(toks: Toks, st: Toks = Nil, out: Toks = Nil) : Toks = ???
 
 
 // (4)
-def compute(toks: Toks, st: List[Int] = Nil) : Int = ???
+def compute(toks: Toks, st: List[Int] = Nil) : Int =
+	toks match {
+    case Nil => if (st.length == 1) st.head else -1
+
+    case x::xs if x.forall(_.isDigit) => compute(xs, x.toInt :: st)
+
+    case x::xs if x == "+" => {
+      val num1 = st.head
+      val num2 = st.tail.head
+
+      val restOfList = st.tail.tail
+      compute(xs, (num2 + num1) :: restOfList)
+    }
+
+    case x::xs if x == "-" => {
+      val num1 = st.head
+      val num2 = st.tail.head
+
+      val restOfList = st.tail.tail
+      compute(xs, (num2 - num1)::restOfList)
+    }
+
+    case x::xs if x == "*" => {
+      val num1 = st.head
+      val num2 = st.tail.head
+
+      val restOfList = st.tail.tail
+      compute(xs, (num2 * num1)::restOfList)
+    }
+
+    case x::xs if x == "/" => {
+      val num1 = st.head
+      val num2 = st.tail.head
+
+      val restOfList = st.tail.tail
+      compute(xs, (num2 / num1)::restOfList)
+    }
+
+    case x::xs if x == "^" => {
+      val num1 = st.head
+      val num2 = BigInt(st.tail.head)
+
+      val restOfList = st.tail.tail
+
+      compute(xs, (num2.pow(num1)).toInt::restOfList)
+    }
+
+    case _ => -1
+  }
 
 
 // test cases
