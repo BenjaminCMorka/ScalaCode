@@ -12,9 +12,14 @@ import scala.util._
 
 
 //(1)
-def get_wordle_list(url: String) : List[String] = ???
 
-// val secrets = get_wordle_list("https://nms.kcl.ac.uk/christian.urban/wordle.txt")
+def split(s: String) : List[String] = s.split("\n").toList
+
+def get_wordle_list(url: String) : List[String] = {
+    Try ( split(Source.fromURL(url) ("ISO-8859-1").mkString) ).getOrElse(Nil)
+}
+
+// val secrets = M2.get_wordle_list("https://nms.kcl.ac.uk/christian.urban/wordle.txt")
 // secrets.length // => 12972
 // secrets.filter(_.length != 5) // => Nil
 
