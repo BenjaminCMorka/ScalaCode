@@ -24,10 +24,35 @@ def split(s: String) : Toks = s.split(" ").toList
 
 
 // (1) 
-def is_op(op: String) : Boolean = ???
-def prec(op1: String, op2: String) : Boolean = ???
+def is_op(op: String) : Boolean = ops.contains(op)
 
-def syard(toks: Toks, st: Toks = Nil, out: Toks = Nil) : Toks = ???
+def prec(op1: String, op2: String) : Boolean = precs.getOrElse(op1, 0) >= precs.getOrElse(op2, 0)
+
+def syard(toks: Toks, st: Toks = Nil, out: Toks = Nil) : Toks = 
+	toks match {
+		case Nil => out ++ st.filter(is_op)
+
+		case x::xs if x.forall(_.isDigit) => syard(xs, st, out:+ x)
+
+		case x::xs if is_op(x) && st.nonEmpty && prec(st.head, x) => syard(x::xs, st.tail, out:+ st.head)
+
+		case x::xs if is_op(x) && (st.isEmpty || !prec(st.head, x)) => syard(xs, x::st, out)
+
+		case x::xs if x == "(" => syard(xs, x::st, out)
+
+		case x::xs if x == ")" => {
+			st match {
+				
+				case hd::tl if hd == "(" => syard(xs, tl, out) 
+
+				case hd::tl if is_op(hd) => syard(x::xs, tl, out:+ hd) 
+
+				case _  => out
+			}
+			
+		}
+		case _ => out
+	}
 
 
 // test cases
@@ -43,7 +68,7 @@ def syard(toks: Toks, st: Toks = Nil, out: Toks = Nil) : Toks = ???
 //syard(split("( 3 + ( 4 + 5 ) )"))    // 3 4 5 + +
 //syard(split("( ( ( 3 ) ) + ( ( 4 + ( 5 ) ) ) )")) // 3 4 5 + +
 
- 
+
 // (2) 
 def compute(toks: Toks, st: List[Int] = Nil) : Int = ???
 
