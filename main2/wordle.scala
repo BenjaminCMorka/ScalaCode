@@ -150,14 +150,25 @@ def lowest(secrets: List[String], word: String, current: Int, acc: List[String])
 def evil(secrets: List[String], word: String) : List[String] = lowest(secrets, word, Int.MaxValue, Nil)
 
 
-//evil(secrets, "stent").length
+// M2.evil(secrets, "stent").length
 //evil(secrets, "hexes").length
 //evil(secrets, "horse").length
 //evil(secrets, "hoise").length
 //evil(secrets, "house").length
 
 // (6)
-def frequencies(secrets: List[String]) : Map[Char, Double] = ???
+def frequencies(secrets: List[String]) : Map[Char, Double] = {
+    val letters = secrets.mkString.toList.filter(_.isLower)
+
+    val freqPairs = letters.map( letter => ( letter, 1 - ((letters.count(_ == letter).toDouble)/letters.length) )   ).distinct
+
+    freqPairs.toMap
+}
+
+
+
+
+
 
 // (7)
 def rank(frqs: Map[Char, Double], s: String) : Double = ???
