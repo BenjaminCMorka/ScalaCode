@@ -59,7 +59,16 @@ case object Present extends Tip
 case object Correct extends Tip
 
 
-def pool(secret: String, word: String) : List[Char] = ??? 
+def pool(secret: String, word: String) : List[Char] = 
+    (secret.toList, word.toList) match {
+        case (Nil, _) => Nil
+
+        case (secFirst :: secRest, wordFirst :: wordRest) if secFirst == wordFirst => pool(secRest.mkString, wordRest.mkString)
+
+        case(secFirst :: secRest, wordFirst :: wordRest) if secFirst != wordFirst => secFirst :: pool(secRest.mkString, wordRest.mkString)
+
+        case _ => Nil
+    }
 
 def aux(secret: List[Char], word: List[Char], pool: List[Char]) : List[Tip] = ???
 
