@@ -161,8 +161,9 @@ def frequencies(secrets: List[String]) : Map[Char, Double] = {
     val letters = secrets.mkString.toList.filter(_.isLower)
 
     val letterGroups = letters.groupBy(identity)
-    val freqPairs = letterGroups.map { case (letter, group) =>
-        letter -> (1.0 - (group.length.toDouble / letters.length.toDouble))
+    
+    letterGroups.map { group =>
+        group._1 -> (1.0 - group._2.length.toDouble / letters.length)
     }
 
     freqPairs
