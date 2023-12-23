@@ -106,9 +106,26 @@ def score(secret: String, word: String) : List[Tip] = aux(secret.toList, word.to
 // score("chess", "eexss") // => List(Present, Absent, Absent, Correct, Correct)
 
 // (4)
-def eval(t: Tip) : Int = ???
+def eval(t: Tip) : Int = 
+    t match {
+        case Correct => 10
 
-def iscore(secret: String, word: String) : Int = ???
+        case Present => 1
+
+        case Absent => 0
+
+        case _ => - 1
+    } 
+
+def iscore(secret: String, word: String) : Int = {
+    score(secret, word) match {
+        case Nil => 0
+
+        case x::xs => (x::xs).map(eval).sum
+        
+        case null => 0
+    }
+}
 
 //iscore("chess", "caves") // => 21
 //iscore("chess", "swiss") // => 20
