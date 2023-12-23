@@ -166,12 +166,24 @@ def frequencies(secrets: List[String]) : Map[Char, Double] = {
 }
 
 
-
-
-
-
 // (7)
-def rank(frqs: Map[Char, Double], s: String) : Double = ???
+def rank(frqs: Map[Char, Double], s: String) : Double = getFreqSum(frqs, s.toList)
+
+def getFreqSum(frqs: Map[Char, Double], s: List[Char], vals: List[Double] = Nil) : Double =
+    s match {
+        case Nil => vals.head
+
+        case x::xs if frqs.keys.toList.contains(x) && vals != Nil => getFreqSum(frqs, xs,frqs.getOrElse(x, 0.0) + vals.head :: vals)
+
+        case x::xs if frqs.keys.toList.contains(x) && vals == Nil => getFreqSum(frqs, xs, frqs.getOrElse(x, 0.0) :: vals)
+
+        case _ => 0.0
+    }
+
+
+
+
+
 
 def ranked_evil(secrets: List[String], word: String) : List[String] = ???
 
