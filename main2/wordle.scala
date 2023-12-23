@@ -30,17 +30,9 @@ def removeN[A](xs: List[A], elem: A, n: Int) : List[A] =
 
         case hd::tl if (hd::tl).count(_ == elem) < n => xs.filter(_ != elem)
 
-        case hd::tl if (hd::tl).count(_ == elem) == n => {
-            if(hd != elem){
-                hd :: removeN(tl, elem, n)
-            }
-            else{
-                removeN(tl, elem, n - 1)
-            }
-        }
-        case hd::tl if (hd::tl).count(_ == elem) > n && n == 0 => (hd::tl)
+        case hd::tl if (hd::tl).count(_ == elem) >= n && n == 0 => (hd::tl)
 
-        case hd::tl if (hd::tl).count(_ == elem) > n && n > 0 => {
+        case hd::tl if (hd::tl).count(_ == elem) >= n && n > 0 => {
             if(hd != elem){
                 hd :: removeN(tl, elem, n)
             }
@@ -57,8 +49,8 @@ def removeN[A](xs: List[A], elem: A, n: Int) : List[A] =
 
 // M2.removeN(List(1,2,3,2,1), 3, 1)  // => List(1, 2, 2, 1)
 // M2.removeN(List(1,2,3,2,1), 2, 1)  // => List(1, 3, 2, 1)
-// removeN(List(1,2,3,2,1), 1, 1)  // => List(2, 3, 2, 1)
-// removeN(List(1,2,3,2,1), 0, 2)  // => List(1, 2, 3, 2, 1)
+// M2.removeN(List(1,2,3,2,1), 1, 1)  // => List(2, 3, 2, 1)
+// M2.removeN(List(1,2,3,2,1), 0, 2)  // => List(1, 2, 3, 2, 1)
 
 // (3)
 abstract class Tip
