@@ -4,5 +4,10 @@
 .bsp/
 *.tasty
 *.jar
+*.o
+*.obj
+*.ipch
+*.vs
+*.dSYM
 *.class
 .DS_Store
