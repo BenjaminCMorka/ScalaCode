@@ -67,12 +67,37 @@ def pool(secret: String, word: String) : List[Char] =
 
         case(secFirst :: secRest, wordFirst :: wordRest) if secFirst != wordFirst => secFirst :: pool(secRest.mkString, wordRest.mkString)
 
+        case (_, _) => Nil
+    }
+
+def aux(secret: List[Char], word: List[Char], pool: List[Char]) : List[Tip] = 
+    (secret, word) match {
+
+        case (Nil, _) => Nil
+
+        case (secFirst :: secRest, wordFirst :: wordRest) if secFirst == wordFirst => Correct :: aux(secRest, wordRest, pool)
+
+        case (secFirst :: secRest, wordFirst :: wordRest) if (secFirst != wordFirst && pool.contains(wordFirst)) => {
+            val poolLetterRemoved = removeLetterOccurrence(wordFirst, pool)
+
+            Present :: aux(secRest, wordRest, poolLetterRemoved)
+        }
+        case (secFirst :: secRest, wordFirst :: wordRest) if (secFirst != wordFirst && !pool.contains(wordFirst)) => Absent :: aux(secRest, wordRest, pool)
+
+        case (_, _) => Nil
+
+    }
+
+def removeLetterOccurrence(wordFirst: Char, pool: List[Char]) : List[Char] = 
+
+    pool match {
+        case Nil => Nil
+        case x::xs if x == wordFirst => xs
+        case x::xs if x != wordFirst => x :: removeLetterOccurrence(wordFirst, xs)
         case _ => Nil
     }
 
-def aux(secret: List[Char], word: List[Char], pool: List[Char]) : List[Tip] = ???
-
-def score(secret: String, word: String) : List[Tip] = ???
+def score(secret: String, word: String) : List[Tip] = aux(secret.toList, word.toList, pool(secret, word))
 
 
 // score("chess", "caves") // => List(Correct, Absent, Absent, Present, Correct)
