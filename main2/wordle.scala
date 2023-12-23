@@ -160,9 +160,12 @@ def evil(secrets: List[String], word: String) : List[String] = lowest(secrets, w
 def frequencies(secrets: List[String]) : Map[Char, Double] = {
     val letters = secrets.mkString.toList.filter(_.isLower)
 
-    val freqPairs = letters.map( letter => ( letter, 1 - ((letters.count(_ == letter).toDouble)/(letters.length).toDouble) )   ).distinct
+    val letterGroups = letters.groupBy(identity)
+    val freqPairs = letterGroups.map { case (letter, group) =>
+        letter -> (1.0 - (group.length.toDouble / letters.length.toDouble))
+    }
 
-    freqPairs.toMap
+    freqPairs
 }
 
 
