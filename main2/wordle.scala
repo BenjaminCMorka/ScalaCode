@@ -122,7 +122,7 @@ def iscore(secret: String, word: String) : Int = {
         case Nil => 0
 
         case x::xs => (x::xs).map(eval).sum
-        
+
         case null => 0
     }
 }
@@ -131,9 +131,23 @@ def iscore(secret: String, word: String) : Int = {
 //iscore("chess", "swiss") // => 20
 
 // (5)
-def lowest(secrets: List[String], word: String, current: Int, acc: List[String]) : List[String] = ???
+def lowest(secrets: List[String], word: String, current: Int, acc: List[String]) : List[String] = 
+    secrets match {
+        case Nil => acc
 
-def evil(secrets: List[String], word: String) : List[String] = ???
+        case x::xs if iscore(x, word) == current => lowest(xs, word, current, x::acc)
+
+        case x::xs if iscore(x, word) < current => lowest(xs, word, iscore(x, word), List(x))
+
+        case x::xs if iscore(x, word) > current => lowest(xs, word, current, acc) 
+
+        case _ => Nil
+
+    }
+
+
+
+def evil(secrets: List[String], word: String) : List[String] = lowest(secrets, word, Int.MaxValue, Nil)
 
 
 //evil(secrets, "stent").length
