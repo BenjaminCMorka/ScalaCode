@@ -161,6 +161,7 @@ def frequencies(secrets: List[String]) : Map[Char, Double] = {
     val letters = secrets.mkString.toList.filter(_.isLower)
 
     val letterGroups = letters.groupBy(identity)
+
     letterGroups.map { group =>
         group._1 -> (1.0 - group._2.length.toDouble / letters.length)
     }
@@ -183,10 +184,12 @@ def getFreqSum(frqs: Map[Char, Double], s: List[Char], vals: List[Double] = Nil)
 
 
 def ranked_evil(secrets: List[String], word: String) : List[String] = {
-    
-    val evilOutputRanked =  evil(secrets, word).groupBy(rank(frequencies(secrets), _))
+    val evilOutput = evil(secrets, word)
+    val freqs = frequencies(secrets)
 
-    evilOutputRanked.getOrElse(evilOutputRanked.keys.max, Nil)
+    val evilOutputRanked = evilOutput.groupBy(rank(freqs, _))
+    val highestRank = evilOutputRanked.keys.max
+
+    evilOutputRanked.getOrElse(highestRank, Nil)
 }
-
 }
