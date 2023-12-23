@@ -181,11 +181,20 @@ def getFreqSum(frqs: Map[Char, Double], s: List[Char], vals: List[Double] = Nil)
     }
 
 
+def ranked_evil(secrets: List[String], word: String) : List[String] = {
+    val evilOutput = evil(secrets, word)
+    val freqs =  frequencies(secrets)
+
+    highest(evilOutput, freqs)
+}
 
 
+def highest(secrets: List[String],  freqs: Map[Char, Double], current: Double = Double.MinValue, acc: List[String] = Nil) : List[String] = {
 
+    val rankedSecrets = secrets.groupBy(rank(freqs, _))
+    val maxRank = rankedSecrets.keys.max
 
-def ranked_evil(secrets: List[String], word: String) : List[String] = ???
+    rankedSecrets.getOrElse(maxRank, Nil)
 
-
+}
 }
