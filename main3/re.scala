@@ -50,30 +50,93 @@ extension (r: Rexp) {
 //======================
 
 // (1)
-def nullable (r: Rexp) : Boolean = ???
+def nullable (r: Rexp) : Boolean = 
+  r match {
+    case ZERO => false
+    case ONE => true
+    case CHAR(c) => false
+    case ALTs(rs) => rs.exists(nullable)
+    case SEQs(rs) => rs.forall(nullable)
+    case STAR(r) => true
+  }
 
 // (2) 
-def der (c: Char, r: Rexp) : Rexp = ???
+def der (c: Char, r: Rexp) : Rexp = 
+  r match {
+    case ZERO => ZERO
+    case ONE => ZERO
+    case CHAR(d) => if (c==d) ONE else ZERO
+    case ALTs(rs) if rs != Nil => ALTs(rs.map( reg => der(c, reg)))
+    case SEQs(rs) if rs == Nil => ZERO
+    case SEQs(r::rs) => if(nullable(r)) SEQs(der(c, r)::rs) + (der(c, SEQs(rs))) else SEQs(der(c, r)::rs)
+    case STAR(r) => charlist2rexp(List(der(c, r), STAR(r)))
+
+  }
+
 
 // (3) 
-def denest(rs: List[Rexp]) : List[Rexp] = ???
+def denest(rs: List[Rexp]) : List[Rexp] = 
+  rs match {
+    case Nil => Nil
+    case ZERO::rest => denest(rest)
+    case ALTs(rs)::rest => rs:::denest(rest)
+    case r::rest => r::denest(rest)
+  }
+
 
 // (4)
-def flts(rs: List[Rexp], acc: List[Rexp] = Nil) : List[Rexp] = ???
+def flts(rs: List[Rexp], acc: List[Rexp] = Nil) : List[Rexp] = 
+  rs match {
+    case Nil => acc
+    case ZERO::rest => List(ZERO)
+    case ONE::rest => flts(rest, acc)
+    case SEQs(rs)::rest => flts(rest, acc:::rs)
+    case r::rest => flts(rest, acc ::: List(r))
+  }
+
 
 // (5)
-def ALTs_smart(rs: List[Rexp]) : Rexp = ???
-def SEQs_smart(rs: List[Rexp]) : Rexp = ???
+def ALTs_smart(rs: List[Rexp]) : Rexp = 
+  rs match {
+    case Nil => ZERO
+    case List(r) => r
+    case _ => ALTs(rs)
+  }
+
+def SEQs_smart(rs: List[Rexp]) : Rexp = 
+  rs match {
+    case Nil => ONE
+    case List(ZERO) => ZERO
+    case List(r) => r
+    case _ => SEQs(rs)
+  }
 
 // (6)
-def simp(r: Rexp) : Rexp = ???
+def simp(r: Rexp) : Rexp = 
+  r match {
+    case ALTs(rs) => ALTs_smart(denest(rs.map(reg => simp(reg))).distinct)
+    case SEQs(rs) => SEQs_smart(flts(rs.map(reg => simp(reg))))
+    case _ => r
+  }
 
 // (7)
-def ders (s: List[Char], r: Rexp) : Rexp = ???
-def matcher(r: Rexp, s: String): Boolean = ???
+def ders (s: List[Char], r: Rexp) : Rexp = 
+  s match {
+    case Nil => 
+    case c::cs => ders(cs, simp(der(c, r)))
+  }
+
+def matcher(r: Rexp, s: String): Boolean = nullable(ders(s.toList, r))
 
 // (8) 
-def size(r: Rexp): Int = ???
+def size(r: Rexp): Int = 
+  r match {
+    case ZERO => ONE
+    case ONE => ONE
+    case c => ONE
+    case ALTs(rs) => ONE + (rs.map(reg => size(reg))).sum
+    case STAR(r) => ONE + size(r)
+  }
 
 
 // Some testing data
