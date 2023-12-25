@@ -68,8 +68,8 @@ def der (c: Char, r: Rexp) : Rexp =
     case CHAR(d) => if (c==d) ONE else ZERO
     case ALTs(rs) if rs != Nil => ALTs(rs.map( reg => der(c, reg)))
     case SEQs(rs) if rs == Nil => ZERO
-    case SEQs(r::rs) => if(nullable(r)) SEQs(der(c, r)::rs) + (der(c, SEQs(rs))) else SEQs(der(c, r)::rs)
-    case STAR(r) => charlist2rexp(List(der(c, r), STAR(r)))
+    case SEQs(r::rs) => if(nullable(r)) (SEQs(der(c, r)::rs) | (der(c, SEQs(rs)))) else SEQs(der(c, r)::rs)
+    case STAR(r) => der(c, r) ~ STAR(r)
 
   }
 
@@ -122,7 +122,7 @@ def simp(r: Rexp) : Rexp =
 // (7)
 def ders (s: List[Char], r: Rexp) : Rexp = 
   s match {
-    case Nil => 
+    case Nil => r
     case c::cs => ders(cs, simp(der(c, r)))
   }
 
@@ -131,11 +131,12 @@ def matcher(r: Rexp, s: String): Boolean = nullable(ders(s.toList, r))
 // (8) 
 def size(r: Rexp): Int = 
   r match {
-    case ZERO => ONE
-    case ONE => ONE
-    case c => ONE
-    case ALTs(rs) => ONE + (rs.map(reg => size(reg))).sum
-    case STAR(r) => ONE + size(r)
+    case ZERO => 1
+    case ONE => 1
+    case c => 1
+    case ALTs(rs) => 1 + (rs.map(reg => size(reg))).sum
+    case SEQs(rs) => 1 + (rs.map(reg => size(reg))).sum
+    case STAR(r) => 1 + size(r)
   }
 
 
