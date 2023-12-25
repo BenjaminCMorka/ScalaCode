@@ -133,10 +133,10 @@ def size(r: Rexp): Int =
   r match {
     case ZERO => 1
     case ONE => 1
+    case CHAR(c) => 1
     case ALTs(rs) => 1 + (rs.map(reg => size(reg))).sum
     case SEQs(rs) => 1 + (rs.map(reg => size(reg))).sum
     case STAR(r) => 1 + size(r)
-    case c => 1
   }
 
 
