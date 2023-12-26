@@ -156,16 +156,72 @@ case object DL extends Move
 
 
 // Task 1: 
-def eval(pc: Piece, m: Move, en: Int, b: Board) : Set[Piece] = ???
+def eval(pc: Piece, m: Move, en: Int, b: Board) : Set[Piece] = 
+  (pc.pos, en) match {
+    case (p, _) if !inside(p, b) => Set()
+
+    case (p, 0) if !is_occupied(p, b) => Set(pc)
+
+    case (p, 0) if is_occupied(p, b) && (occupied_by(p, b).getOrElse(-1) != pc.col) => Set(pc)
+
+    case (p, 0) if is_occupied(p, b) && (occupied_by(p, b).getOrElse(-1) == pc.col) => Set()
+
+    case (p, n) if n > 0 && is_occupied(p, b) => Set()
+
+    case (_, _) => 
+      m match {
+        case U => eval(incy(pc), U, en-1, b)
+
+        case D => eval(decy(pc), D, en -1, b)
+
+        case R => eval(incx(pc), R, en-1, b)
+
+        case L => eval(decx(pc), L, en-1, b)
+
+        case RU => eval(incx(pc), RU, en-1, b) ++ eval(pc, U, en, b)
+
+        case LU => eval(decx(pc), LU, en-1, b) ++ eval(pc, U, en, b)
+
+        case RD => eval(incx(pc), RD, en-1, b) ++ eval(pc, D, en, b)
+
+        case LD => eval(decx(pc), LD, en-1, b) ++ eval(pc, D, en, b)
+
+        case UR => eval(incy(pc), UR, en-1, b) ++ eval(pc, R, en, b)
+
+        case UL => eval(incy(pc), UL, en-1, b) ++ eval(pc, L, en, b)
+
+        case DR => eval(decy(pc), DR, en-1, b) ++ eval(pc, R, en, b)
+
+        case DL => eval(decx(pc), DL, en-1, b) ++ eval(pc, L, en, b)
+      }
+  }
+
+
+
+
+
 
 
 // Task 2: 
-def all_moves(pc: Piece, b: Board) : Set[Piece] = ???
+def all_moves(pc: Piece, b: Board) : Set[Piece] = {
+  Set(U, D, R, L, RU, LU, RD, LD, UR, UL, DR, DL).flatMap(m => eval(pc, m, pc.en, b-pc))
+}
+
+
 
 
 // Task 3: 
-def attacked(c: Colour, b: Board) : Set[Piece] = ???
+def attacked(c: Colour, b: Board) : Set[Piece] = {
+  val oppositePieces = b.pces.partition(_.col != c)._1
 
+  oppositePieces.partition(isAttacked(_, b, c))._1
+  
+
+}
+
+def isAttacked(pc: Piece, b: Board, c: Colour) : Boolean = {
+  b.pces.count(attacker => all_moves(attacker, b).count( attacked => attacker.col == c && attacked.pos == pc.pos ) > 0) > 0
+}
 
 // Task 4: 
 def attackedN(pc: Piece, b: Board) : Int = ???

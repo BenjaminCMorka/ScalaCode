@@ -55,7 +55,7 @@ def nullable (r: Rexp) : Boolean =
     case ZERO => false
     case ONE => true
     case CHAR(c) => false
-    case ALTs(rs) => rs.exists(nullable)
+    case ALTs(rs) => rs.count(nullable(_)) > 0
     case SEQs(rs) => rs.forall(nullable)
     case STAR(r) => true
   }
@@ -153,7 +153,7 @@ matcher(("a" ~ "b") ~ "c", "abc")  // => true
 
 
 // the supposedly 'evil' regular expression (a*)* b
-val EVIL = SEQ(STAR(STAR(CHAR('a'))), CHAR('b'))
+val EVIL = M3.SEQ(M3.STAR(M3.STAR(M3.CHAR('a'))), M3.CHAR('b'))
 
 matcher(EVIL, "a" * 1000)          // => false
 matcher(EVIL, "a" * 1000 ++ "b")   // => true
@@ -183,7 +183,7 @@ def time_needed[T](i: Int, code: => T) = {
 }
 
 for (i <- 0 to 5000000 by 500000) {
-  println(s"$i ${time_needed(2, matcher(EVIL, "a" * i))} secs.") 
+  println(s"$i ${time_needed(2, M3.matcher(EVIL, "a" * i))} secs.") 
 }
 
 // another "power" test case 
