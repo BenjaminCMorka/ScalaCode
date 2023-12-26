@@ -216,7 +216,6 @@ def attacked(c: Colour, b: Board) : Set[Piece] = {
 
   oppositePieces.partition(isAttacked(_, b, c))._1
   
-
 }
 
 def isAttacked(pc: Piece, b: Board, c: Colour) : Boolean = {
@@ -224,7 +223,10 @@ def isAttacked(pc: Piece, b: Board, c: Colour) : Boolean = {
 }
 
 // Task 4: 
-def attackedN(pc: Piece, b: Board) : Int = ???
+def attackedN(pc: Piece, b: Board) : Int = {
+  b.pces.partition(_.col != pc.col)._1.map(p => all_moves(p, b).toList.map(_.pos))
+    .count(_.count(tempPos => tempPos == pc.pos) > 0)
+}
 
 
 // Task 5: 
