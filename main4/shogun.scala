@@ -230,7 +230,12 @@ def attackedN(pc: Piece, b: Board) : Int = {
 
 
 // Task 5: 
-def protectedN(pc: Piece, b: Board) : Int = ???
+def protectedN(pc: Piece, b: Board) : Int = {
+
+  b.pces.partition(_.col == pc.col)._1.count(protectPiece => all_moves(protectPiece, b - pc).count(tempPc => tempPc.pos == pc.pos) > 0
+  )
+
+}
 
 
 // Task 6: 
