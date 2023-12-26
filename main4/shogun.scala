@@ -162,9 +162,7 @@ def eval(pc: Piece, m: Move, en: Int, b: Board) : Set[Piece] =
 
     case (p, 0) if !is_occupied(p, b) => Set(pc)
 
-    case (p, 0) if is_occupied(p, b) && (occupied_by(p, b).getOrElse(-1) != pc.col) => Set(pc)
-
-    case (p, 0) if is_occupied(p, b) && (occupied_by(p, b).getOrElse(-1) == pc.col) => Set()
+    case (p, 0) if is_occupied(p, b) => if((occupied_by(p, b) != Some(pc.col))) Set(pc) else Set()
 
     case (p, n) if n > 0 && is_occupied(p, b) => Set()
 
@@ -192,7 +190,7 @@ def eval(pc: Piece, m: Move, en: Int, b: Board) : Set[Piece] =
 
         case DR => eval(decy(pc), DR, en-1, b) ++ eval(pc, R, en, b)
 
-        case DL => eval(decx(pc), DL, en-1, b) ++ eval(pc, L, en, b)
+        case DL => eval(decy(pc), DL, en-1, b) ++ eval(pc, L, en, b)
       }
   }
 
@@ -289,5 +287,7 @@ println(s"all moves:   ${all_moves(pw2, bt)}")
 */
 
 }
+
+
 
 
