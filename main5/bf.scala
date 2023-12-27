@@ -16,13 +16,15 @@ import scala.util._
 //======================
 
 // (1)
-def load_bff(name: String) : String = ???
+def load_bff(name: String) : String = {
+    Try (Source.fromFile(name, "ISO-8859-1").mkString).getOrElse("")
+}
 
 // (2) 
 
-def sread(mem: Mem, mp: Int) : Int = ???
+def sread(mem: Mem, mp: Int) : Int = mem.getOrElse(mp, 0)
 
-def write(mem: Mem, mp: Int, v: Int) : Mem = ???
+def write(mem: Mem, mp: Int, v: Int) : Mem = mem.updated(mp, v)
 
 // (3) 
 
