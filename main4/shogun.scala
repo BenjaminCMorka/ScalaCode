@@ -221,7 +221,13 @@ def isAttacked(pc: Piece, b: Board, c: Colour) : Boolean = {
 }
 
 // Task 4: 
-def attackedN(pc: Piece, b: Board) : Int = ???
+def attackedN(pc: Piece, b: Board) : Int = {
+  val oppositePieces = b.pces.partition(_.col != pc.col)._1
+
+  oppositePieces.count(p => all_moves(p, b)
+    .count(tempPc => tempPc.pos == pc.pos) > 0
+  )
+}
 
 
 // Task 5: 
