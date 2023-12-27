@@ -4,6 +4,7 @@
 .bsp/
 *.tasty
 *.jar
+*.bf
 *.o
 *.obj
 *.ipch
