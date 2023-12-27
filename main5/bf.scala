@@ -75,9 +75,47 @@ def jumpLeft(prog: String, pc: Int, level: Int) : Int = {
 
 // (4) 
 
-def compute(prog: String, pc: Int, mp: Int, mem: Mem) : Mem = ???
+def compute(prog: String, pc: Int, mp: Int, mem: Mem) : Mem = 
+    (pc, mp, mem) match {
+        case (pcVal, mpVal, memVal) if(pcVal >= prog.size || pcVal < 0) => memVal
 
-def run(prog: String, m: Mem = Map()) = ???
+        case (pcVal, mpVal, memVal) if(pcVal < prog.size || pcVal > 0) => 
+            prog(pcVal) match {
+                case '>' => compute(prog, pcVal+1, mpVal+1, memVal)
+                
+                case '<' => compute(prog, pcVal+1, mpVal-1, memVal)
+
+                case '+' => compute(prog, pcVal+1, mpVal, write(memVal, mpVal, sread(memVal, mpVal) + 1))
+
+                case '-' => compute(prog, pcVal+1, mpVal, write(memVal, mpVal, sread(memVal, mpVal) - 1))
+
+                case '.' => {
+                    print(sread(memVal, mpVal).toChar) 
+
+                    compute(prog, pcVal+1, mpVal, memVal)
+                }
+
+                case '[' => {
+                    sread(memVal, mpVal) match {
+                        case 0 => compute(prog, jumpRight(prog, pcVal+1, 0), mpVal, memVal)
+
+                        case _ => compute(prog, pcVal+1, mpVal, memVal)
+                    }
+                }
+
+                case ']' => {
+                    sread(memVal, mpVal) match {
+                        case 0 => compute(prog, pcVal +1, mpVal, memVal)
+
+                        case _ =>compute(prog, jumpLeft(prog, pcVal-1, 0), mpVal, memVal)
+                    }
+                }
+                case _ => compute(prog, pcVal+1, mpVal, memVal)
+            }
+        
+    }
+
+def run(prog: String, m: Mem = Map()) = compute(prog, 0, 0, m)
 
 // (5)
 def generate(msg: List[Char]) : String = ???
