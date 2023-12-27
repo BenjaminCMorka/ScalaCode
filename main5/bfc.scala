@@ -37,7 +37,62 @@ import scala.util._
 //======================
 
 // (6) 
-def jtable(pg: String) : Map[Int, Int] = ???
+def jtable(pg: String) : Map[Int, Int] = {
+  val pgLst = pg.toList
+
+  val indexes = getIndexList(pgLst)
+
+  val openingBracketIndexes = indexes.filter(index => pgLst(index) == '[')
+
+  val openingBracketPositions = openingBracketIndexes.map(index => index+1)
+
+  val closingBracketIndexes = indexes.filter(index => pgLst(index) == ']')
+
+  val closingBracketPositions = closingBracketIndexes.map(index => index-1)
+
+  (openingBracketPositions.map(pos => pos-1 -> jumpRight(pg, pos, 0)) ++ closingBracketPositions.map(pos => pos+1 -> jumpLeft(pg, pos, 0))).toMap
+
+}
+
+def getIndexList(lst: List[Char], currentIndex: Int = 0): List[Int] = 
+  lst match {
+    case Nil => Nil
+    case _ :: tail => currentIndex :: getIndexList(tail, currentIndex + 1)
+}
+
+def jumpRight(prog: String, pc: Int, level: Int) : Int = {
+    if(pc >= prog.size){
+        pc
+    }
+    else{
+        prog(pc) match {
+            case '[' => jumpRight(prog, pc+1, level+1)
+
+            case ']' if level != 0 => jumpRight(prog, pc +1, level-1)
+
+            case ']' if level == 0 => pc +1
+
+            case _ => jumpRight(prog, pc + 1, level)
+        }
+    }
+}
+
+def jumpLeft(prog: String, pc: Int, level: Int) : Int = {
+    if(pc < 0){
+        pc
+    }
+    else{
+        prog(pc) match {
+            case ']' => jumpLeft(prog, pc-1, level+1)
+
+            case '[' if level != 0 => jumpLeft(prog, pc-1, level-1)
+
+            case '[' if level == 0 => pc +1
+
+            case _ => jumpLeft(prog, pc - 1, level)
+        }
+    }
+}
 
 // testcase
 //
