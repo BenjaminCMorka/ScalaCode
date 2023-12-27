@@ -287,7 +287,3 @@ println(s"all moves:   ${all_moves(pw2, bt)}")
 */
 
 }
-
-
-
-
