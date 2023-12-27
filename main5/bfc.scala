@@ -57,7 +57,7 @@ def jtable(pg: String) : Map[Int, Int] = {
 def getIndexList(lst: List[Char], currentIndex: Int = 0): List[Int] = 
   lst match {
     case Nil => Nil
-    case _ :: tail => currentIndex :: getIndexList(tail, currentIndex + 1)
+    case _ :: tl => currentIndex :: getIndexList(tl, currentIndex + 1)
 }
 
 def jumpRight(prog: String, pc: Int, level: Int) : Int = {
@@ -100,8 +100,51 @@ def jumpLeft(prog: String, pc: Int, level: Int) : Int = {
 // =>  Map(69 -> 61, 5 -> 20, 60 -> 70, 27 -> 44, 43 -> 28, 19 -> 6)
 
 
-def compute2(pg: String, tb: Map[Int, Int], pc: Int, mp: Int, mem: Mem) : Mem = ???
-def run2(pg: String, m: Mem = Map()) = ???
+def compute2(pg: String, tb: Map[Int, Int], pc: Int, mp: Int, mem: Mem) : Mem = 
+  (pc, mp, mem) match {
+    case (pcVal, mpVal, memVal) if(pcVal >= pg.size || pcVal < 0) => memVal
+
+    case (pcVal, mpVal, memVal) if(pcVal < pg.size || pcVal >= 0) => 
+        pg(pcVal) match {
+            case '>' => compute2(pg, tb, pcVal+1, mpVal+1, memVal)
+            
+            case '<' => compute2(pg, tb, pcVal+1, mpVal-1, memVal)
+
+            case '+' => compute2(pg, tb, pcVal+1, mpVal, write(memVal, mpVal, sread(memVal, mpVal) + 1))
+
+            case '-' => compute2(pg, tb, pcVal+1, mpVal, write(memVal, mpVal, sread(memVal, mpVal) - 1))
+
+            case '.' => {
+                print(sread(memVal, mpVal).toChar) 
+
+                compute2(pg, tb, pcVal+1, mpVal, memVal)
+            }
+
+            case '[' => {
+                sread(memVal, mpVal) match {
+                    case 0 => compute2(pg, tb, tb.getOrElse(pcVal, -1), mpVal, memVal)
+
+                    case _ => compute2(pg, tb, pcVal+1, mpVal, memVal)
+                }
+            }
+
+            case ']' => {
+                sread(memVal, mpVal) match {
+                    case 0 => compute2(pg, tb, pcVal +1, mpVal, memVal)
+
+                    case _ => compute2(pg, tb, tb.getOrElse(pcVal, -1), mpVal, memVal)
+                }
+            }
+            case _ => compute2(pg, tb, pcVal+1, mpVal, memVal)
+        }
+    
+}
+
+def sread(mem: Mem, mp: Int) : Int = mem.getOrElse(mp, 0)
+
+def write(mem: Mem, mp: Int, v: Int) : Mem = mem.updated(mp, v)
+
+def run2(pg: String, m: Mem = Map()) = compute2(pg, jtable(pg), 0, 0, m)
 
 // testcases
 // time_needed(1, run2(load_bff("benchmark.bf")))
