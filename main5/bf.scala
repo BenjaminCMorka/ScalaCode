@@ -118,7 +118,11 @@ def compute(prog: String, pc: Int, mp: Int, mem: Mem) : Mem =
 def run(prog: String, m: Mem = Map()) = compute(prog, 0, 0, m)
 
 // (5)
-def generate(msg: List[Char]) : String = ???
+def generate(msg: List[Char]) : String = msg.mkString.map(c => charToPlus(c) + ".[-]").mkString
+
+
+def charToPlus(c: Char) : String = "+" * c.toInt
+
 
 
 
