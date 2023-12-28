@@ -36,6 +36,7 @@ def prod(lst1: List[String], lst2: List[String]) : Int = {
 def overlap(lst1: List[String], lst2: List[String]) : Double = {
 
     val squareLst1 = prod(lst1, lst1)
+    
     val squareLst2 = prod(lst2, lst2)
 
     (prod(lst1, lst2).toDouble / squareLst1.max(squareLst2))

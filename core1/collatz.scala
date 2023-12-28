@@ -45,6 +45,7 @@ def last_odd(n: Long) : Long = {
         if( is_even(n)){
             last_odd(n/2)
         }
+        
         else{
             last_odd((n * 3) + 1)
         }

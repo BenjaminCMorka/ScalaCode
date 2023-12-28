@@ -92,8 +92,11 @@ def removeLetterOccurrence(wordFirst: Char, pool: List[Char]) : List[Char] =
 
     pool match {
         case Nil => Nil
+
         case x::xs if x == wordFirst => xs
+
         case x::xs if x != wordFirst => x :: removeLetterOccurrence(wordFirst, xs)
+        
         case _ => Nil
     }
 

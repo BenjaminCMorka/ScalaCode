@@ -214,7 +214,7 @@ def run3(pg: String, m: Mem = Map()) = compute3(optimise(pg), jtable(optimise(pg
 
 // (8)  
 def combine(s: String) : String = {
-  val consecutiveChars = split(s.toList.tail, s.head, List(s.head.toString)).reverse
+  val consecutiveChars = splitConsecutive(s.toList.tail, s.head, List(s.head.toString)).reverse
 
   consecutiveChars.map(s => formatString(s)).mkString
 
@@ -249,13 +249,13 @@ def splitBy26(input: String): List[String] = {
 }
 
 
-def split(characters: List[Char], current: Char, acc: List[String]): List[String] = {
+def splitConsecutive(characters: List[Char], current: Char, acc: List[String]): List[String] = {
   characters match {
     case Nil => acc
     case head :: tail if head == current =>
-      split(tail, current, (current.toString + acc.head) :: acc.tail)
+      splitConsecutive(tail, current, (current.toString + acc.head) :: acc.tail)
     case head :: tail =>
-      split(tail, head, head.toString :: acc)
+      splitConsecutive(tail, head, head.toString :: acc)
   }
 }
 

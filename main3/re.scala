@@ -53,10 +53,15 @@ extension (r: Rexp) {
 def nullable (r: Rexp) : Boolean = 
   r match {
     case ZERO => false
+
     case ONE => true
+
     case CHAR(c) => false
+
     case ALTs(rs) => rs.count(nullable(_)) > 0
+
     case SEQs(rs) => rs.forall(nullable)
+    
     case STAR(r) => true
   }
 

@@ -248,11 +248,11 @@ def legal_moves(pc: Piece, b: Board) : Set[Piece] = {
   } 
   else {
     val notAttacked = all_moves(pc, b).partition(attackedN(_, b) == 0)._1
-    notAttacked.partition(protectedBlocks(_, b) < 1)._1
+    notAttacked.partition(protectBlocks(_, b) < 1)._1
   }
 }
 
-def protectedBlocks(pc: Piece, b: Board) : Int = {
+def protectBlocks(pc: Piece, b: Board) : Int = {
   val oppositePieces = b.pces.partition(_.col != pc.col)._1
   oppositePieces.count (p => ((p.pos == pc.pos) && protectedN(p,b) > 0))
 }
