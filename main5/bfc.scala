@@ -253,12 +253,94 @@ def split(characters: List[Char], current: Char, acc: List[String]): List[String
 
 // testcase
 // combine(load_bff("benchmark.bf"))
+def isLetter(c: Char) : Boolean = {
+  val alphabet = ('A' to 'Z').toList
+  alphabet.contains(c)
+}
 
-def compute4(pg: String, tb: Map[Int, Int], pc: Int, mp: Int, mem: Mem) : Mem = ???
+def getConsecutiveNum(c: Char) = {
+  val alphabet = ('A' to 'Z').toList
+  val alphabetMap = alphabet.map(letter => (letter, alphabet.indexOf(letter)+1)).toMap
+
+  alphabetMap.getOrElse(c, -1)
+}
+
+def compute4(pg: String, tb: Map[Int, Int], pc: Int, mp: Int, mem: Mem) : Mem = 
+  (pc, mp, mem) match {
+  case (pcVal, mpVal, memVal) if(pcVal >= pg.size || pcVal < 0) => memVal
+
+  case (pcVal, mpVal, memVal) if(pcVal < pg.size || pcVal >= 0) => 
+      pg(pcVal) match {
+          case '>' => {
+            val newPcVal =  if((pg(pcVal+2) < pg.size) && isLetter(pg(pcVal+2))) pcVal + 3 else pcVal + 2
+            val newMpVal = {
+              if((pg(pcVal+2) < pg.size) && isLetter(pg(pcVal+2))) mpVal + getConsecutiveNum(pg(pcVal+1)) + getConsecutiveNum(pg(pcVal+2))
+              else mpVal + getConsecutiveNum(pg(pcVal+1))
+            }
+            compute4(pg, tb, newPcVal , newMpVal, memVal)
+          }
+          
+          case '<' => {
+            val newPcVal =  if((pg(pcVal+2) < pg.size) && isLetter(pg(pcVal+2))) pcVal + 3 else pcVal + 2
+            val newMpVal = {
+              if((pg(pcVal+2) < pg.size) && isLetter(pg(pcVal+2))) mpVal - (getConsecutiveNum(pg(pcVal+1)) + getConsecutiveNum(pg(pcVal+2))) 
+              else mpVal - getConsecutiveNum(pg(pcVal+1))
+            }
+            compute4(pg, tb, newPcVal , newMpVal, memVal)
+          }
+
+          case '+' => {
+            val newPcVal =  if((pg(pcVal+2) < pg.size) && isLetter(pg(pcVal+2))) pcVal + 3 else pcVal + 2
+            val newMemVal = {
+              if((pg(pcVal+2) < pg.size) && isLetter(pg(pcVal+2))) sread(memVal, mpVal) + (getConsecutiveNum(pg(pcVal+1)) + getConsecutiveNum(pg(pcVal+2))) 
+              else sread(memVal, mpVal) + getConsecutiveNum(pg(pcVal+1))
+            }
+            compute4(pg, tb, newPcVal, mpVal, write(memVal, mpVal, newMemVal))
+          }
+
+          case '-' => {
+            val newPcVal =  if((pg(pcVal+2) < pg.size) && isLetter(pg(pcVal+2))) pcVal + 3 else pcVal + 2
+            val newMemVal = {
+              if((pg(pcVal+2) < pg.size) && isLetter(pg(pcVal+2))) sread(memVal, mpVal) - (getConsecutiveNum(pg(pcVal+1)) + getConsecutiveNum(pg(pcVal+2))) 
+              else sread(memVal, mpVal) - getConsecutiveNum(pg(pcVal+1))
+            }
+            compute4(pg, tb, newPcVal, mpVal, write(memVal, mpVal, newMemVal))
+          }
+
+          case '.' => {
+              print(sread(memVal, mpVal).toChar) 
+
+              compute4(pg, tb, pcVal+1, mpVal, memVal)
+          }
+
+          case '[' => {
+              sread(memVal, mpVal) match {
+                  case 0 => compute4(pg, tb, tb.getOrElse(pcVal, -1), mpVal, memVal)
+
+                  case _ => compute4(pg, tb, pcVal+1, mpVal, memVal)
+              }
+          }
+
+          case ']' => {
+              sread(memVal, mpVal) match {
+                  case 0 => compute4(pg, tb, pcVal +1, mpVal, memVal)
+
+                  case _ => compute4(pg, tb, tb.getOrElse(pcVal, -1), mpVal, memVal)
+              }
+          }
+          case '0' => compute4(pg, tb, pcVal + 1, mpVal, write(memVal, mpVal, 0))
+
+          case n if isLetter(n) && !isLetter(pg(pcVal-1)) => compute4(pg, tb, pcVal+1, mpVal, memVal)
+          
+          case _ => compute4(pg, tb, pcVal+1, mpVal, memVal)
+      }
+  }
+
+
 
 // should call first optimise and then combine on the input string
 //
-def run4(pg: String, m: Mem = Map()) = ???
+def run4(pg: String, m: Mem = Map()) = compute4(combine(optimise(pg)), jtable(combine(optimise(pg))), 0, 0, m)
 
 
 // testcases
@@ -268,6 +350,5 @@ def run4(pg: String, m: Mem = Map()) = ???
 // time_needed(1, run4(load_bff("benchmark.bf")))
 // time_needed(1, run4(load_bff("sierpinski.bf"))) 
 // time_needed(1, run4(load_bff("mandelbrot.bf")))
-
 
 }
