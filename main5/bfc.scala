@@ -40,7 +40,7 @@ import scala.util._
 def jtable(pg: String) : Map[Int, Int] = {
   val pgLst = pg.toList
 
-  val indexes = getIndexList(pgLst)
+  val indexes = pgLst.indices.toList
 
   val openingBracketIndexes = indexes.filter(index => pgLst(index) == '[')
 
@@ -104,7 +104,7 @@ def compute2(pg: String, tb: Map[Int, Int], pc: Int, mp: Int, mem: Mem) : Mem =
   (pc, mp, mem) match {
     case (pcVal, mpVal, memVal) if(pcVal >= pg.size || pcVal < 0) => memVal
 
-    case (pcVal, mpVal, memVal) if(pcVal < pg.size || pcVal >= 0) => 
+    case (pcVal, mpVal, memVal) if(pcVal < pg.size && pcVal >= 0) => 
         pg(pcVal) match {
             case '>' => compute2(pg, tb, pcVal+1, mpVal+1, memVal)
             
@@ -162,7 +162,7 @@ def compute3(pg: String, tb: Map[Int, Int], pc: Int, mp: Int, mem: Mem) : Mem =
   (pc, mp, mem) match {
   case (pcVal, mpVal, memVal) if(pcVal >= pg.size || pcVal < 0) => memVal
 
-  case (pcVal, mpVal, memVal) if(pcVal < pg.size || pcVal >= 0) => 
+  case (pcVal, mpVal, memVal) if(pcVal < pg.size && pcVal >= 0) => 
       pg(pcVal) match {
           case '>' => compute3(pg, tb, pcVal+1, mpVal+1, memVal)
           
@@ -208,13 +208,12 @@ def run3(pg: String, m: Mem = Map()) = compute3(optimise(pg), jtable(optimise(pg
 // optimise(load_bff("benchmark.bf"))          // should have inserted 0's
 // optimise(load_bff("mandelbrot.bf")).length  // => 11205
 // 
-// time_needed(1, run3(load_bff("benchmark.bf")))
+// time_needed(1, combine(load_bff("benchmark.bf")))
 
 
 
 // (8)  
 def combine(s: String) : String = {
-
   val consecutiveChars = split(s.toList.tail, s.head, List(s.head.toString)).reverse
 
   consecutiveChars.map(s => formatString(s)).mkString
@@ -232,13 +231,23 @@ def formatString(s: String) : String = {
     if(s.size <= 26) s.head.toString + alphabetMap.getOrElse(s.size, -1).toString 
     
     else{
-      val sizeOver26 = 1 + (s.size - 1) / 26
-      s.head.toString + alphabetMap.getOrElse(s.size, -1).toString + alphabetMap.getOrElse(sizeOver26, -1).toString
+      splitBy26(s).map(str => formatString(str)).mkString
     }
   }
+
     
   else s.head.toString * s.size
 }
+
+def splitBy26(input: String): List[String] = {
+  if (input == "") {
+    Nil
+  } else {
+    val (chunk, remaining) = input.splitAt(26)
+    chunk :: splitBy26(remaining)
+  }
+}
+
 
 def split(characters: List[Char], current: Char, acc: List[String]): List[String] = {
   characters match {
@@ -269,42 +278,23 @@ def compute4(pg: String, tb: Map[Int, Int], pc: Int, mp: Int, mem: Mem) : Mem =
   (pc, mp, mem) match {
   case (pcVal, mpVal, memVal) if(pcVal >= pg.size || pcVal < 0) => memVal
 
-  case (pcVal, mpVal, memVal) if(pcVal < pg.size || pcVal >= 0) => 
+  case (pcVal, mpVal, memVal) if(pcVal < pg.size && pcVal >= 0) => 
       pg(pcVal) match {
+
           case '>' => {
-            val newPcVal =  if((pg(pcVal+2) < pg.size) && isLetter(pg(pcVal+2))) pcVal + 3 else pcVal + 2
-            val newMpVal = {
-              if((pg(pcVal+2) < pg.size) && isLetter(pg(pcVal+2))) mpVal + getConsecutiveNum(pg(pcVal+1)) + getConsecutiveNum(pg(pcVal+2))
-              else mpVal + getConsecutiveNum(pg(pcVal+1))
-            }
-            compute4(pg, tb, newPcVal , newMpVal, memVal)
+            compute4(pg, tb, pcVal + 2 , mpVal + getConsecutiveNum(pg(pcVal+1)), memVal)
           }
           
-          case '<' => {
-            val newPcVal =  if((pg(pcVal+2) < pg.size) && isLetter(pg(pcVal+2))) pcVal + 3 else pcVal + 2
-            val newMpVal = {
-              if((pg(pcVal+2) < pg.size) && isLetter(pg(pcVal+2))) mpVal - (getConsecutiveNum(pg(pcVal+1)) + getConsecutiveNum(pg(pcVal+2))) 
-              else mpVal - getConsecutiveNum(pg(pcVal+1))
-            }
-            compute4(pg, tb, newPcVal , newMpVal, memVal)
+          case '<'  => {
+            compute4(pg, tb, pcVal+2 , mpVal - getConsecutiveNum(pg(pcVal+1)), memVal)
           }
 
-          case '+' => {
-            val newPcVal =  if((pg(pcVal+2) < pg.size) && isLetter(pg(pcVal+2))) pcVal + 3 else pcVal + 2
-            val newMemVal = {
-              if((pg(pcVal+2) < pg.size) && isLetter(pg(pcVal+2))) sread(memVal, mpVal) + (getConsecutiveNum(pg(pcVal+1)) + getConsecutiveNum(pg(pcVal+2))) 
-              else sread(memVal, mpVal) + getConsecutiveNum(pg(pcVal+1))
-            }
-            compute4(pg, tb, newPcVal, mpVal, write(memVal, mpVal, newMemVal))
+          case '+'  => {
+            compute4(pg, tb, pcVal+2, mpVal, write(memVal, mpVal, sread(memVal, mpVal) + getConsecutiveNum(pg(pcVal+1)) ))
           }
 
-          case '-' => {
-            val newPcVal =  if((pg(pcVal+2) < pg.size) && isLetter(pg(pcVal+2))) pcVal + 3 else pcVal + 2
-            val newMemVal = {
-              if((pg(pcVal+2) < pg.size) && isLetter(pg(pcVal+2))) sread(memVal, mpVal) - (getConsecutiveNum(pg(pcVal+1)) + getConsecutiveNum(pg(pcVal+2))) 
-              else sread(memVal, mpVal) - getConsecutiveNum(pg(pcVal+1))
-            }
-            compute4(pg, tb, newPcVal, mpVal, write(memVal, mpVal, newMemVal))
+          case '-'  => {
+            compute4(pg, tb, pcVal+2, mpVal, write(memVal, mpVal, sread(memVal, mpVal) - getConsecutiveNum(pg(pcVal+1))))
           }
 
           case '.' => {
@@ -323,19 +313,16 @@ def compute4(pg: String, tb: Map[Int, Int], pc: Int, mp: Int, mem: Mem) : Mem =
 
           case ']' => {
               sread(memVal, mpVal) match {
-                  case 0 => compute4(pg, tb, pcVal +1, mpVal, memVal)
+                  case 0 => compute4(pg, tb, pcVal+1, mpVal, memVal)
 
                   case _ => compute4(pg, tb, tb.getOrElse(pcVal, -1), mpVal, memVal)
               }
           }
-          case '0' => compute4(pg, tb, pcVal + 1, mpVal, write(memVal, mpVal, 0))
+          case '0' => compute4(pg, tb, pcVal+1, mpVal, write(memVal, mpVal, 0))
 
-          case n if isLetter(n) && !isLetter(pg(pcVal-1)) => compute4(pg, tb, pcVal+1, mpVal, memVal)
-          
           case _ => compute4(pg, tb, pcVal+1, mpVal, memVal)
       }
   }
-
 
 
 // should call first optimise and then combine on the input string

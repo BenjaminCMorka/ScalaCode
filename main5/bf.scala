@@ -79,7 +79,7 @@ def compute(prog: String, pc: Int, mp: Int, mem: Mem) : Mem =
     (pc, mp, mem) match {
         case (pcVal, mpVal, memVal) if(pcVal >= prog.size || pcVal < 0) => memVal
 
-        case (pcVal, mpVal, memVal) if(pcVal < prog.size || pcVal >= 0) => 
+        case (pcVal, mpVal, memVal) if(pcVal < prog.size && pcVal >= 0) => 
             prog(pcVal) match {
                 case '>' => compute(prog, pcVal+1, mpVal+1, memVal)
                 
