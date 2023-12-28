@@ -139,7 +139,9 @@ def compute2(pg: String, tb: Map[Int, Int], pc: Int, mp: Int, mem: Mem) : Mem =
         }
     
 }
-
+def load_bff(name: String) : String = {
+    Try (Source.fromFile(name, "ISO-8859-1").mkString).getOrElse("")
+}
 def sread(mem: Mem, mp: Int) : Int = mem.getOrElse(mp, 0)
 
 def write(mem: Mem, mp: Int, v: Int) : Mem = mem.updated(mp, v)
@@ -211,7 +213,34 @@ def run3(pg: String, m: Mem = Map()) = compute3(optimise(pg), jtable(optimise(pg
 
 
 // (8)  
-def combine(s: String) : String = ???
+def combine(s: String) : String = {
+
+  val consecutiveChars = split(s.toList.tail, s.head, List(s.head.toString)).reverse
+
+  consecutiveChars.map(s => formatString(s)).mkString
+
+}
+
+def formatString(s: String) : String = {
+  val alphabet = ('A' to 'Z').toList
+
+  val alphabetMap = alphabet.map(letter => (alphabet.indexOf(letter)+1, letter)).toMap
+
+  val charsToCheck = List('+','-','<','>')
+
+  if(charsToCheck.contains(s.head)) s.head.toString + alphabetMap.getOrElse(s.size, -1).toString else s.head.toString * s.size
+}
+
+def split(characters: List[Char], current: Char, acc: List[String]): List[String] = {
+  characters match {
+    case Nil => acc
+    case head :: tail if head == current =>
+      split(tail, current, (current.toString + acc.head) :: acc.tail)
+    case head :: tail =>
+      split(tail, head, head.toString :: acc)
+  }
+}
+
 
 // testcase
 // combine(load_bff("benchmark.bf"))
