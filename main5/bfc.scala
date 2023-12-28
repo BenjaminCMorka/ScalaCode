@@ -140,7 +140,7 @@ def compute2(pg: String, tb: Map[Int, Int], pc: Int, mp: Int, mem: Mem) : Mem =
     
 }
 def load_bff(name: String) : String = {
-    Try (Source.fromFile(name, "ISO-8859-1").mkString).getOrElse("")
+    Try (Source.fromFile(name).mkString).getOrElse("")
 }
 def sread(mem: Mem, mp: Int) : Int = mem.getOrElse(mp, 0)
 
@@ -243,8 +243,8 @@ def splitBy26(input: String): List[String] = {
   if (input == "") {
     Nil
   } else {
-    val (chunk, remaining) = input.splitAt(26)
-    chunk :: splitBy26(remaining)
+    val (part, remaining) = input.splitAt(26)
+    part :: splitBy26(remaining)
   }
 }
 
@@ -262,17 +262,6 @@ def split(characters: List[Char], current: Char, acc: List[String]): List[String
 
 // testcase
 // combine(load_bff("benchmark.bf"))
-def isLetter(c: Char) : Boolean = {
-  val alphabet = ('A' to 'Z').toList
-  alphabet.contains(c)
-}
-
-def getConsecutiveNum(c: Char) = {
-  val alphabet = ('A' to 'Z').toList
-  val alphabetMap = alphabet.map(letter => (letter, alphabet.indexOf(letter)+1)).toMap
-
-  alphabetMap.getOrElse(c, -1)
-}
 
 def compute4(pg: String, tb: Map[Int, Int], pc: Int, mp: Int, mem: Mem) : Mem = 
   (pc, mp, mem) match {
@@ -282,31 +271,29 @@ def compute4(pg: String, tb: Map[Int, Int], pc: Int, mp: Int, mem: Mem) : Mem =
       pg(pcVal) match {
 
           case '>' => {
-            compute4(pg, tb, pcVal + 2 , mpVal + getConsecutiveNum(pg(pcVal+1)), memVal)
+            compute4(pg, tb, pcVal+2 , mpVal + (pg(pcVal+1).toInt - 64), memVal)
           }
           
           case '<'  => {
-            compute4(pg, tb, pcVal+2 , mpVal - getConsecutiveNum(pg(pcVal+1)), memVal)
+            compute4(pg, tb, pcVal+2 , mpVal - (pg(pcVal+1).toInt - 64), memVal)
           }
 
           case '+'  => {
-            compute4(pg, tb, pcVal+2, mpVal, write(memVal, mpVal, sread(memVal, mpVal) + getConsecutiveNum(pg(pcVal+1)) ))
+            compute4(pg, tb, pcVal+2, mpVal, write(memVal, mpVal, sread(memVal, mpVal) + (pg(pcVal+1).toInt - 64) ))
           }
 
           case '-'  => {
-            compute4(pg, tb, pcVal+2, mpVal, write(memVal, mpVal, sread(memVal, mpVal) - getConsecutiveNum(pg(pcVal+1))))
+            compute4(pg, tb, pcVal+2, mpVal, write(memVal, mpVal, sread(memVal, mpVal) -(pg(pcVal+1).toInt - 64)))
           }
 
           case '.' => {
-              print(sread(memVal, mpVal).toChar) 
-
+              print(sread(memVal, mpVal).toChar)
               compute4(pg, tb, pcVal+1, mpVal, memVal)
           }
 
           case '[' => {
               sread(memVal, mpVal) match {
                   case 0 => compute4(pg, tb, tb.getOrElse(pcVal, -1), mpVal, memVal)
-
                   case _ => compute4(pg, tb, pcVal+1, mpVal, memVal)
               }
           }
@@ -314,7 +301,6 @@ def compute4(pg: String, tb: Map[Int, Int], pc: Int, mp: Int, mem: Mem) : Mem =
           case ']' => {
               sread(memVal, mpVal) match {
                   case 0 => compute4(pg, tb, pcVal+1, mpVal, memVal)
-
                   case _ => compute4(pg, tb, tb.getOrElse(pcVal, -1), mpVal, memVal)
               }
           }
@@ -323,6 +309,7 @@ def compute4(pg: String, tb: Map[Int, Int], pc: Int, mp: Int, mem: Mem) : Mem =
           case _ => compute4(pg, tb, pcVal+1, mpVal, memVal)
       }
   }
+
 
 
 // should call first optimise and then combine on the input string
