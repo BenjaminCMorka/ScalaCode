@@ -154,11 +154,51 @@ def run2(pg: String, m: Mem = Map()) = compute2(pg, jtable(pg), 0, 0, m)
 
 // (7) 
 
-def optimise(s: String) : String = ???
+def optimise(s: String) : String = s.replaceAll("""[^<>+\-.\[\]]""", "").replaceAll("""\[-\]""", "0")
 
-def compute3(pg: String, tb: Map[Int, Int], pc: Int, mp: Int, mem: Mem) : Mem = ???
+def compute3(pg: String, tb: Map[Int, Int], pc: Int, mp: Int, mem: Mem) : Mem = 
+  (pc, mp, mem) match {
+  case (pcVal, mpVal, memVal) if(pcVal >= pg.size || pcVal < 0) => memVal
 
-def run3(pg: String, m: Mem = Map()) = ???
+  case (pcVal, mpVal, memVal) if(pcVal < pg.size || pcVal >= 0) => 
+      pg(pcVal) match {
+          case '>' => compute3(pg, tb, pcVal+1, mpVal+1, memVal)
+          
+          case '<' => compute3(pg, tb, pcVal+1, mpVal-1, memVal)
+
+          case '+' => compute3(pg, tb, pcVal+1, mpVal, write(memVal, mpVal, sread(memVal, mpVal) + 1))
+
+          case '-' => compute3(pg, tb, pcVal+1, mpVal, write(memVal, mpVal, sread(memVal, mpVal) - 1))
+
+          case '.' => {
+              print(sread(memVal, mpVal).toChar) 
+
+              compute3(pg, tb, pcVal+1, mpVal, memVal)
+          }
+
+          case '[' => {
+              sread(memVal, mpVal) match {
+                  case 0 => compute3(pg, tb, tb.getOrElse(pcVal, -1), mpVal, memVal)
+
+                  case _ => compute3(pg, tb, pcVal+1, mpVal, memVal)
+              }
+          }
+
+          case ']' => {
+              sread(memVal, mpVal) match {
+                  case 0 => compute3(pg, tb, pcVal +1, mpVal, memVal)
+
+                  case _ => compute3(pg, tb, tb.getOrElse(pcVal, -1), mpVal, memVal)
+              }
+          }
+          case '0' => compute3(pg, tb, pcVal + 1, mpVal, write(memVal, mpVal, 0))
+            
+          
+          case _ => compute3(pg, tb, pcVal+1, mpVal, memVal)
+      }
+  }
+
+def run3(pg: String, m: Mem = Map()) = compute3(optimise(pg), jtable(optimise(pg)), 0, 0, m)
 
 
 // testcases
