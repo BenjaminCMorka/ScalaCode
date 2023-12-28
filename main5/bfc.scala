@@ -228,7 +228,16 @@ def formatString(s: String) : String = {
 
   val charsToCheck = List('+','-','<','>')
 
-  if(charsToCheck.contains(s.head)) s.head.toString + alphabetMap.getOrElse(s.size, -1).toString else s.head.toString * s.size
+  if(charsToCheck.contains(s.head)) {
+    if(s.size <= 26) s.head.toString + alphabetMap.getOrElse(s.size, -1).toString 
+    
+    else{
+      val sizeOver26 = 1 + (s.size - 1) / 26
+      s.head.toString + alphabetMap.getOrElse(s.size, -1).toString + alphabetMap.getOrElse(sizeOver26, -1).toString
+    }
+  }
+    
+  else s.head.toString * s.size
 }
 
 def split(characters: List[Char], current: Char, acc: List[String]): List[String] = {
