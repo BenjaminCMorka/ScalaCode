@@ -140,7 +140,7 @@ def compute2(pg: String, tb: Map[Int, Int], pc: Int, mp: Int, mem: Mem) : Mem =
     
 }
 def load_bff(name: String) : String = {
-    Try (Source.fromFile(name).mkString).getOrElse("")
+    Try (Source.fromFile(name, "ISO-8859-1").mkString).getOrElse("")
 }
 def sread(mem: Mem, mp: Int) : Int = mem.getOrElse(mp, 0)
 
