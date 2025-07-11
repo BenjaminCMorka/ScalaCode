@@ -35,8 +35,6 @@ val precs = Map("+" -> 1,
 // the operations in the basic version of the algorithm
 val ops = List("+", "-", "*", "/", "^")
 
-// ADD YOUR CODE BELOW
-//======================
 def is_op(op: String) : Boolean = ops.contains(op)
 
 def prec(op1: String, op2: String) : Boolean = precs.getOrElse(op1, 0) >= precs.getOrElse(op2, 0)
