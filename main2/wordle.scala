@@ -7,8 +7,6 @@ object M2 {
 import io.Source
 import scala.util._
 
-// ADD YOUR CODE BELOW
-//======================
 
 
 //(1)
