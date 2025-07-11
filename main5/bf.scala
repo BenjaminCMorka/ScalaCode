@@ -12,8 +12,6 @@ type Mem = Map[Int, Int]
 import io.Source
 import scala.util._
 
-// ADD YOUR CODE BELOW
-//======================
 
 // (1)
 def load_bff(name: String) : String = {
