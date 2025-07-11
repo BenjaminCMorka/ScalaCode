@@ -19,9 +19,6 @@ val precs = Map("+" -> 1,
 // helper function for splitting strings into tokens
 def split(s: String) : Toks = s.split(" ").toList
 
-// ADD YOUR CODE BELOW
-//======================
-
 
 // (1) 
 def is_op(op: String) : Boolean = ops.contains(op)
