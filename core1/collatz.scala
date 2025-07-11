@@ -1,10 +1,8 @@
-// Core Part 1 about the 3n+1 conjecture
-//============================================
+// 3n+1 conjecture
+
 
 object C1 {
 
-// ADD YOUR CODE BELOW
-//======================
 
 
 //(1) 
